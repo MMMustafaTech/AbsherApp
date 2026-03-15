@@ -1,5 +1,6 @@
 package com.absher.absherapp.controller;
 
+import com.absher.absherapp.dto.RegisterRequest;
 import com.absher.absherapp.service.UserService;
 import org.springframework.web.bind.annotation.*;
 
@@ -14,11 +15,9 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(
-            @RequestParam String nationalId,
-            @RequestParam String password) {
+    public String register(@RequestBody RegisterRequest request) {
 
-        userService.register(nationalId, password);
+        userService.register(request.getNationalId(), request.getPassword());
 
         return "User registered successfully";
     }
