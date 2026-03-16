@@ -20,4 +20,7 @@ public class User {
     private String nationalIdNumber;
 
     private String password;
+
+    @Column(unique = true)
+    private String email;
 }

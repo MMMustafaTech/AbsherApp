@@ -17,7 +17,7 @@ public class UserService {
         this.nationalRepository = nationalRepository;
     }
 
-    public void register(String nationalId, String password) {
+    public void register(String nationalId, String password, String email) {
 
         if (!nationalRepository.existsByNationalIdNumber(nationalId)) {
             throw new RuntimeException("National ID does not exist");
@@ -26,10 +26,14 @@ public class UserService {
         if (userRepository.existsByNationalIdNumber(nationalId)) {
             throw new RuntimeException("User already exists");
         }
+        if (userRepository.existsByEmail(email)) {
+            throw new RuntimeException("Email already used");
+        }
 
         User user = new User();
         user.setNationalIdNumber(nationalId);
         user.setPassword(password);
+        user.setEmail(email);
 
         userRepository.save(user);
     }
