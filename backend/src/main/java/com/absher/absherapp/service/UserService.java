@@ -3,6 +3,7 @@ package com.absher.absherapp.service;
 import com.absher.absherapp.entity.User;
 import com.absher.absherapp.repository.UserRepository;
 import com.absher.absherapp.repository.NationalIdentityRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -10,11 +11,15 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final NationalIdentityRepository nationalRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
-                       NationalIdentityRepository nationalRepository) {
+                       NationalIdentityRepository nationalRepository,
+                       PasswordEncoder passwordEncoder) {
+
         this.userRepository = userRepository;
         this.nationalRepository = nationalRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public void register(String nationalId, String password, String email) {
@@ -32,9 +37,21 @@ public class UserService {
 
         User user = new User();
         user.setNationalIdNumber(nationalId);
-        user.setPassword(password);
+        user.setPassword(passwordEncoder.encode(password));
         user.setEmail(email);
 
         userRepository.save(user);
+    }
+
+
+    public User login(String nationalId, String password) {
+        User user = userRepository.findByNationalIdNumber(nationalId)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new RuntimeException("Invalid credentials");
+        }
+
+        return user;
     }
 }

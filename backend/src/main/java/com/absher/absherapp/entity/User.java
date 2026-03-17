@@ -1,5 +1,6 @@
 package com.absher.absherapp.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -19,6 +20,7 @@ public class User {
     @Column(name = "national_id_number", unique = true, nullable = false)
     private String nationalIdNumber;
 
+    @JsonIgnore
     private String password;
 
     @Column(unique = true)
