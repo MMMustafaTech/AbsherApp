@@ -8,7 +8,6 @@ import lombok.Setter;
 public class PassportResponse {
     private String passportNumber;
     private String firstName;
-    private String fatherName;
     private String lastName;
 
     private String birthDate;
@@ -26,7 +25,6 @@ public class PassportResponse {
 
     public PassportResponse( String passportNumber,
                              String firstName,
-                             String fatherName,
                              String lastName,
                              String birthDate,
                              String birthPlace,
@@ -40,7 +38,6 @@ public class PassportResponse {
 
         this.passportNumber = passportNumber;
         this.firstName = firstName;
-        this.fatherName = fatherName;
         this.lastName = lastName;
         this.birthDate = birthDate;
         this.birthPlace = birthPlace;

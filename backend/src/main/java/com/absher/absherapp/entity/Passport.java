@@ -20,9 +20,6 @@ public class Passport {
 
     private String name;
 
-    @Column(name = "father_name")
-    private String fatherName;
-
     @Column(name = "last_name")
     private String lastName;
 
