@@ -19,27 +19,24 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public String register(@RequestBody RegisterRequest request) {
+    public ResponseEntity<?> register(@RequestBody RegisterRequest request) {
 
-        userService.register(
+        UserResponse response = userService.register(
                 request.getNationalId(),
                 request.getPassword(),
-                request.getEmail());
+                request.getEmail()
+        );
 
-        return "User registered successfully";
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest request) {
-        User user = userService.login(
+        UserResponse response = userService.login(
                 request.getNationalId(),
                 request.getPassword()
         );
-        UserResponse response = new UserResponse(
-                user.getId(),
-                user.getNationalIdNumber(),
-                user.getEmail()
-        );
+
         return ResponseEntity.ok(response);
     }
 }

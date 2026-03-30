@@ -1,8 +1,11 @@
 package com.absher.absherapp.service;
 
+import com.absher.absherapp.dto.UserResponse;
+import com.absher.absherapp.entity.Passport;
 import com.absher.absherapp.entity.User;
 import com.absher.absherapp.exception.BadRequestException;
 import com.absher.absherapp.exception.NotFoundException;
+import com.absher.absherapp.repository.PassportRepository;
 import com.absher.absherapp.repository.UserRepository;
 import com.absher.absherapp.repository.NationalIdentityRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -14,17 +17,19 @@ public class UserService {
     private final UserRepository userRepository;
     private final NationalIdentityRepository nationalRepository;
     private final PasswordEncoder passwordEncoder;
+    private final PassportRepository passportRepository;
 
     public UserService(UserRepository userRepository,
                        NationalIdentityRepository nationalRepository,
-                       PasswordEncoder passwordEncoder) {
+                       PasswordEncoder passwordEncoder, PassportRepository passportRepository) {
 
         this.userRepository = userRepository;
         this.nationalRepository = nationalRepository;
         this.passwordEncoder = passwordEncoder;
+        this.passportRepository = passportRepository;
     }
 
-    public void register(String nationalId, String password, String email) {
+    public UserResponse register(String nationalId, String password, String email) {
 
         if (!nationalRepository.existsByNationalIdNumber(nationalId)) {
             throw new NotFoundException("National ID does not exist");
@@ -43,17 +48,36 @@ public class UserService {
         user.setEmail(email);
 
         userRepository.save(user);
+
+        Passport passport = passportRepository
+                .findByNationalIdNumber(nationalId)
+                .orElseThrow(() -> new NotFoundException("Passport not found"));
+
+        return new UserResponse(
+                user.getId(),
+                user.getNationalIdNumber(),
+                user.getEmail(),
+                passport.getName()
+        );
     }
 
 
-    public User login(String nationalId, String password) {
+    public UserResponse login(String nationalId, String password) {
         User user = userRepository.findByNationalIdNumber(nationalId)
                 .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BadRequestException("Invalid credentials");
         }
+        Passport passport = passportRepository
+                .findByNationalIdNumber(nationalId)
+                .orElseThrow(() -> new NotFoundException("Passport not found"));
 
-        return user;
+        return new UserResponse(
+                user.getId(),
+                user.getNationalIdNumber(),
+                user.getEmail(),
+                passport.getName()
+        );
     }
 }
