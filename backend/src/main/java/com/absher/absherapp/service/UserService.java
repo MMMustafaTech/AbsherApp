@@ -1,6 +1,8 @@
 package com.absher.absherapp.service;
 
 import com.absher.absherapp.entity.User;
+import com.absher.absherapp.exception.BadRequestException;
+import com.absher.absherapp.exception.NotFoundException;
 import com.absher.absherapp.repository.UserRepository;
 import com.absher.absherapp.repository.NationalIdentityRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -25,14 +27,14 @@ public class UserService {
     public void register(String nationalId, String password, String email) {
 
         if (!nationalRepository.existsByNationalIdNumber(nationalId)) {
-            throw new RuntimeException("National ID does not exist");
+            throw new NotFoundException("National ID does not exist");
         }
 
         if (userRepository.existsByNationalIdNumber(nationalId)) {
-            throw new RuntimeException("User already exists");
+            throw new BadRequestException("User already exists");
         }
         if (userRepository.existsByEmail(email)) {
-            throw new RuntimeException("Email already used");
+            throw new BadRequestException("Email already used");
         }
 
         User user = new User();
@@ -46,10 +48,10 @@ public class UserService {
 
     public User login(String nationalId, String password) {
         User user = userRepository.findByNationalIdNumber(nationalId)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new NotFoundException("User not found"));
 
         if (!passwordEncoder.matches(password, user.getPassword())) {
-            throw new RuntimeException("Invalid credentials");
+            throw new BadRequestException("Invalid credentials");
         }
 
         return user;
