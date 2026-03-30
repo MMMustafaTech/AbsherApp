@@ -3,7 +3,6 @@ package com.absher.absherapp.controller;
 import com.absher.absherapp.dto.LoginRequest;
 import com.absher.absherapp.dto.RegisterRequest;
 import com.absher.absherapp.dto.UserResponse;
-import com.absher.absherapp.entity.User;
 import com.absher.absherapp.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
