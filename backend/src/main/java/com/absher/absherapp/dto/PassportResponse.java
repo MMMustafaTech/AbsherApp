@@ -49,5 +49,4 @@ public class PassportResponse {
         this.nationality = nationality;
         this.gender = gender;
     }
-
 }

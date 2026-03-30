@@ -1,7 +1,6 @@
 package com.absher.absherapp.controller;
 
 
-import com.absher.absherapp.dto.PassportRequest;
 import com.absher.absherapp.dto.PassportResponse;
 import com.absher.absherapp.entity.Passport;
 import com.absher.absherapp.service.PassportService;
@@ -17,10 +16,10 @@ public class PassportController {
         this.passportService = passportService;
     }
 
-    @PostMapping
-    public ResponseEntity<?> getPassport(@RequestBody PassportRequest request) {
+    @GetMapping("/{nationalId}")
+    public ResponseEntity<?> getPassport(@PathVariable String nationalId) {
 
-        Passport passport = passportService.getPassportByNationalId(request.getNationalId());
+        Passport passport = passportService.getPassportByNationalId(nationalId);
 
         PassportResponse response = new PassportResponse(
                 passport.getPassportNumber(),
