@@ -7,7 +7,7 @@ import com.absher.absherapp.exception.BadRequestException;
 import com.absher.absherapp.exception.NotFoundException;
 import com.absher.absherapp.repository.PassportRepository;
 import com.absher.absherapp.repository.UserRepository;
-import com.absher.absherapp.repository.NationalIdentityRepository;
+import com.absher.absherapp.repository.NationalIdRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -15,12 +15,12 @@ import org.springframework.stereotype.Service;
 public class UserService {
 
     private final UserRepository userRepository;
-    private final NationalIdentityRepository nationalRepository;
+    private final NationalIdRepository nationalRepository;
     private final PasswordEncoder passwordEncoder;
     private final PassportRepository passportRepository;
 
     public UserService(UserRepository userRepository,
-                       NationalIdentityRepository nationalRepository,
+                       NationalIdRepository nationalRepository,
                        PasswordEncoder passwordEncoder, PassportRepository passportRepository) {
 
         this.userRepository = userRepository;
