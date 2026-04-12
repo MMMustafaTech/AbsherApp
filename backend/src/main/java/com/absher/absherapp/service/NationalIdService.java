@@ -30,12 +30,20 @@ public class NationalIdService {
                 .orElseThrow(() -> new NotFoundException("National ID not found"));
 
         NationalIdResponse response = new NationalIdResponse();
-        response.setNationalIdNumber(identity.getNationalIdNumber());
+        response.setNationalId(identity.getNationalIdNumber());
         response.setFirstName(identity.getName());
         response.setLastName(identity.getLastName());
-        response.setNationality(identity.getNationality());
-        response.setDataofBirth(identity.getDateOfBirth().toString());
-
+        response.setGender(identity.getGender());
+        response.setPlaceOfBirth(identity.getPlaceOfBirth());
+        response.setDateofBirth(identity.getDateOfBirth().toString());
+        response.setCardSerial(identity.getCardSerial());
+        response.setIssueDetails(identity.getPlaceOfIssue() + "/" + identity.getDateOfIssue().toString());
+        response.setDateOfExpiry(identity.getDateOfExpiry().toString());
+        response.setProfession(identity.getProfession());
+        response.setFatherName(identity.getFatherName());
+        response.setMotherName(identity.getMotherName());
+        response.setAddress(identity.getAddress());
+        response.setBloodGroup(identity.getBloodGroup());
         return response;
 
 
