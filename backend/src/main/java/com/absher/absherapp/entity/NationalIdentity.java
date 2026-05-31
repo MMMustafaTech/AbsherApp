@@ -18,7 +18,7 @@ public class NationalIdentity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "national_id_number", unique = true, nullable = false)
+    @Column(name = "national_id_Number", unique = true, nullable = false)
     private String nationalIdNumber;
 
     @Column
@@ -35,8 +35,18 @@ public class NationalIdentity {
 
     private String nationality;
 
+    @Column(name = "card_serial")
+    private String cardSerial;
+
+
+    @Column(name = "gender")
+    private String gender;
+
     @Column(name = "date_of_birth")
     private LocalDate dateOfBirth;
+
+    @Column(name = "place_of_birth")
+    private String placeOfBirth;
 
     @Column(name = "place_of_issue")
     private String placeOfIssue;
@@ -46,4 +56,14 @@ public class NationalIdentity {
 
     @Column(name = "date_of_expiry")
     private LocalDate dateOfExpiry;
+
+    @Column(name = "blood_group")
+    private String bloodGroup;
+
+    @Column(name = "profession")
+    private String profession;
+
+    @Column(name = "address")
+    private String address;
+
 }
