@@ -1,0 +1,195 @@
+[33mcommit b8fbb1da490f80de671137e2845b7ff361c42adf[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mdev[m[33m)[m
+Author: mahamatzene <zainn3915@gmail.com>
+Date:   Sat Jun 20 17:46:32 2026 +0300
+
+    complet the project
+
+ .gitignore                                         |   45 [32m+[m
+ .metadata                                          |   45 [32m+[m
+ README.md                                          |   17 [32m+[m
+ analysis_options.yaml                              |   28 [32m+[m
+ android/.gitignore                                 |   14 [32m+[m
+ android/app/build.gradle.kts                       |   44 [32m+[m
+ android/app/src/debug/AndroidManifest.xml          |    7 [32m+[m
+ android/app/src/main/AndroidManifest.xml           |   45 [32m+[m
+ .../kotlin/com/absher/frontend/MainActivity.kt     |    5 [32m+[m
+ .../main/res/drawable-v21/launch_background.xml    |   12 [32m+[m
+ .../src/main/res/drawable/launch_background.xml    |   12 [32m+[m
+ .../app/src/main/res/mipmap-hdpi/ic_launcher.png   |  Bin [31m0[m -> [32m544[m bytes
+ .../app/src/main/res/mipmap-mdpi/ic_launcher.png   |  Bin [31m0[m -> [32m442[m bytes
+ .../app/src/main/res/mipmap-xhdpi/ic_launcher.png  |  Bin [31m0[m -> [32m721[m bytes
+ .../app/src/main/res/mipmap-xxhdpi/ic_launcher.png |  Bin [31m0[m -> [32m1031[m bytes
+ .../src/main/res/mipmap-xxxhdpi/ic_launcher.png    |  Bin [31m0[m -> [32m1443[m bytes
+ android/app/src/main/res/values-night/styles.xml   |   18 [32m+[m
+ android/app/src/main/res/values/styles.xml         |   18 [32m+[m
+ android/app/src/profile/AndroidManifest.xml        |    7 [32m+[m
+ android/build.gradle.kts                           |   24 [32m+[m
+ android/gradle.properties                          |    2 [32m+[m
+ android/gradle/wrapper/gradle-wrapper.properties   |    5 [32m+[m
+ android/settings.gradle.kts                        |   26 [32m+[m
+ images/birth_certificate.jpeg                      |  Bin [31m0[m -> [32m59357[m bytes
+ images/national_id_tamplate.jpeg                   |  Bin [31m0[m -> [32m200321[m bytes
+ images/passport_template.jpeg                      |  Bin [31m0[m -> [32m152195[m bytes
+ ios/.gitignore                                     |   34 [32m+[m
+ ios/Flutter/AppFrameworkInfo.plist                 |   24 [32m+[m
+ ios/Flutter/Debug.xcconfig                         |    1 [32m+[m
+ ios/Flutter/Release.xcconfig                       |    1 [32m+[m
+ ios/Runner.xcodeproj/project.pbxproj               |  620 [32m+++++++++[m
+ .../project.xcworkspace/contents.xcworkspacedata   |    7 [32m+[m
+ .../xcshareddata/IDEWorkspaceChecks.plist          |    8 [32m+[m
+ .../xcshareddata/WorkspaceSettings.xcsettings      |    8 [32m+[m
+ .../xcshareddata/xcschemes/Runner.xcscheme         |  101 [32m++[m
+ ios/Runner.xcworkspace/contents.xcworkspacedata    |    7 [32m+[m
+ .../xcshareddata/IDEWorkspaceChecks.plist          |    8 [32m+[m
+ .../xcshareddata/WorkspaceSettings.xcsettings      |    8 [32m+[m
+ ios/Runner/AppDelegate.swift                       |   16 [32m+[m
+ .../AppIcon.appiconset/Contents.json               |  122 [32m++[m
+ .../AppIcon.appiconset/Icon-App-1024x1024@1x.png   |  Bin [31m0[m -> [32m10932[m bytes
+ .../AppIcon.appiconset/Icon-App-20x20@1x.png       |  Bin [31m0[m -> [32m295[m bytes
+ .../AppIcon.appiconset/Icon-App-20x20@2x.png       |  Bin [31m0[m -> [32m406[m bytes
+ .../AppIcon.appiconset/Icon-App-20x20@3x.png       |  Bin [31m0[m -> [32m450[m bytes
+ .../AppIcon.appiconset/Icon-App-29x29@1x.png       |  Bin [31m0[m -> [32m282[m bytes
+ .../AppIcon.appiconset/Icon-App-29x29@2x.png       |  Bin [31m0[m -> [32m462[m bytes
+ .../AppIcon.appiconset/Icon-App-29x29@3x.png       |  Bin [31m0[m -> [32m704[m bytes
+ .../AppIcon.appiconset/Icon-App-40x40@1x.png       |  Bin [31m0[m -> [32m406[m bytes
+ .../AppIcon.appiconset/Icon-App-40x40@2x.png       |  Bin [31m0[m -> [32m586[m bytes
+ .../AppIcon.appiconset/Icon-App-40x40@3x.png       |  Bin [31m0[m -> [32m862[m bytes
+ .../AppIcon.appiconset/Icon-App-60x60@2x.png       |  Bin [31m0[m -> [32m862[m bytes
+ .../AppIcon.appiconset/Icon-App-60x60@3x.png       |  Bin [31m0[m -> [32m1674[m bytes
+ .../AppIcon.appiconset/Icon-App-76x76@1x.png       |  Bin [31m0[m -> [32m762[m bytes
+ .../AppIcon.appiconset/Icon-App-76x76@2x.png       |  Bin [31m0[m -> [32m1226[m bytes
+ .../AppIcon.appiconset/Icon-App-83.5x83.5@2x.png   |  Bin [31m0[m -> [32m1418[m bytes
+ .../LaunchImage.imageset/Contents.json             |   23 [32m+[m
+ .../LaunchImage.imageset/LaunchImage.png           |  Bin [31m0[m -> [32m68[m bytes
+ .../LaunchImage.imageset/LaunchImage@2x.png        |  Bin [31m0[m -> [32m68[m bytes
+ .../LaunchImage.imageset/LaunchImage@3x.png        |  Bin [31m0[m -> [32m68[m bytes
+ .../Assets.xcassets/LaunchImage.imageset/README.md |    5 [32m+[m
+ ios/Runner/Base.lproj/LaunchScreen.storyboard      |   37 [32m+[m
+ ios/Runner/Base.lproj/Main.storyboard              |   26 [32m+[m
+ ios/Runner/Info.plist                              |   78 [32m++[m
+ ios/Runner/Runner-Bridging-Header.h                |    1 [32m+[m
+ ios/Runner/SceneDelegate.swift                     |    6 [32m+[m
+ ios/RunnerTests/RunnerTests.swift                  |   12 [32m+[m
+ lib/controller/auth_controller.dart                |   78 [32m++[m
+ lib/controller/birth_certificate_controller.dart   |   92 [32m++[m
+ lib/controller/identity_controller.dart            |   33 [32m+[m
+ lib/controller/passport_controller.dart            |   72 [32m+[m
+ lib/core/constant/app_colors.dart                  |   15 [32m+[m
+ lib/data/datasource/auth_remote_datasource.dart    |   56 [32m+[m
+ .../birth_certificate_remote_datasource.dart       |   72 [32m+[m
+ .../datasource/identity_remote_datasource.dart     |   28 [32m+[m
+ .../datasource/passport_remote_datasource.dart     |   57 [32m+[m
+ lib/data/model/appointment_model.dart              |    0
+ lib/data/model/birth_certificate_model.dart        |   75 [32m+[m
+ lib/data/model/identity_model.dart                 |   67 [32m+[m
+ lib/data/model/license_model.dart                  |    0
+ lib/data/model/passport_model.dart                 |   59 [32m+[m
+ lib/data/model/user_model.dart                     |   27 [32m+[m
+ lib/generated/intl/messages_all.dart               |   80 [32m++[m
+ lib/generated/intl/messages_ar.dart                |  353 [32m+++++[m
+ lib/generated/intl/messages_en.dart                |  371 [32m+++++[m
+ lib/generated/intl/messages_fr.dart                |  393 [32m++++++[m
+ lib/generated/intl/messages_tr.dart                |  371 [32m+++++[m
+ lib/generated/l10n.dart                            | 1450 [32m++++++++++++++++++++[m
+ lib/l10n/intl_ar.arb                               |  205 [32m+++[m
+ lib/l10n/intl_en.arb                               |  208 [32m+++[m
+ lib/l10n/intl_fr.arb                               |  208 [32m+++[m
+ lib/l10n/intl_tr.arb                               |  238 [32m++++[m
+ lib/main.dart                                      |   99 [32m++[m
+ .../birth_certificat_show.dart                     |  252 [32m++++[m
+ .../birth_certificate_services_screen.dart         |  127 [32m++[m
+ .../issuance_of_birth_certificate.dart             |   28 [32m+[m
+ .../newborn_registration.dart                      |  374 [32m+++++[m
+ .../request_for_data_correction.dart               |  476 [32m+++++++[m
+ lib/view/screen/bottomNav/my_account.dart          |  115 [32m++[m
+ lib/view/screen/bottomNav/my_requests.dart         |  119 [32m++[m
+ lib/view/screen/bottomNav/other_services.dart      |  121 [32m++[m
+ lib/view/screen/home_screen.dart                   |  412 [32m++++++[m
+ lib/view/screen/login_screen.dart                  |  109 [32m++[m
+ .../NationalIdLostOrDamaged.dart                   |  530 [32m+++++++[m
+ .../national_id_services/NationalIdRenewal.dart    |  457 [32m++++++[m
+ .../national_id_services/national_id_services.dart |  129 [32m++[m
+ .../national_id_show_screen.dart                   |  272 [32m++++[m
+ .../request_for_data_correction.dart               |  476 [32m+++++++[m
+ .../screen/passport_services/PassportIssuance.dart |  426 [32m++++++[m
+ .../passport_services/PassportLostOrDamaged.dart   |  530 [32m+++++++[m
+ .../screen/passport_services/PassportRenewal.dart  |  455 [32m++++++[m
+ .../screen/passport_services/passport_screen.dart  |  255 [32m++++[m
+ .../passport_services_screen.dart                  |  128 [32m++[m
+ .../request_for_data_correction.dart               |  476 [32m+++++++[m
+ lib/view/screen/signup_screen.dart                 |  122 [32m++[m
+ lib/view/screen/welcome_screen.dart                |  113 [32m++[m
+ lib/view/widget/aad.dart                           |   87 [32m++[m
+ lib/view/widget/button.dart                        |   53 [32m+[m
+ lib/view/widget/cart.dart                          |   93 [32m++[m
+ lib/view/widget/quick_acsess_card.dart             |   82 [32m++[m
+ lib/view/widget/services_cards.dart                |   10 [32m+[m
+ lib/view/widget/textfield.dart                     |   67 [32m+[m
+ linux/.gitignore                                   |    1 [32m+[m
+ linux/CMakeLists.txt                               |  128 [32m++[m
+ linux/flutter/CMakeLists.txt                       |   88 [32m++[m
+ linux/flutter/generated_plugin_registrant.cc       |   11 [32m+[m
+ linux/flutter/generated_plugin_registrant.h        |   15 [32m+[m
+ linux/flutter/generated_plugins.cmake              |   23 [32m+[m
+ linux/runner/CMakeLists.txt                        |   26 [32m+[m
+ linux/runner/main.cc                               |    6 [32m+[m
+ linux/runner/my_application.cc                     |  148 [32m++[m
+ linux/runner/my_application.h                      |   21 [32m+[m
+ macos/.gitignore                                   |    7 [32m+[m
+ macos/Flutter/Flutter-Debug.xcconfig               |    1 [32m+[m
+ macos/Flutter/Flutter-Release.xcconfig             |    1 [32m+[m
+ macos/Flutter/GeneratedPluginRegistrant.swift      |   10 [32m+[m
+ macos/Runner.xcodeproj/project.pbxproj             |  705 [32m++++++++++[m
+ .../xcshareddata/IDEWorkspaceChecks.plist          |    8 [32m+[m
+ .../xcshareddata/xcschemes/Runner.xcscheme         |   99 [32m++[m
+ macos/Runner.xcworkspace/contents.xcworkspacedata  |    7 [32m+[m
+ .../xcshareddata/IDEWorkspaceChecks.plist          |    8 [32m+[m
+ macos/Runner/AppDelegate.swift                     |   13 [32m+[m
+ .../AppIcon.appiconset/Contents.json               |   68 [32m+[m
+ .../AppIcon.appiconset/app_icon_1024.png           |  Bin [31m0[m -> [32m102994[m bytes
+ .../AppIcon.appiconset/app_icon_128.png            |  Bin [31m0[m -> [32m5680[m bytes
+ .../AppIcon.appiconset/app_icon_16.png             |  Bin [31m0[m -> [32m520[m bytes
+ .../AppIcon.appiconset/app_icon_256.png            |  Bin [31m0[m -> [32m14142[m bytes
+ .../AppIcon.appiconset/app_icon_32.png             |  Bin [31m0[m -> [32m1066[m bytes
+ .../AppIcon.appiconset/app_icon_512.png            |  Bin [31m0[m -> [32m36406[m bytes
+ .../AppIcon.appiconset/app_icon_64.png             |  Bin [31m0[m -> [32m2218[m bytes
+ macos/Runner/Base.lproj/MainMenu.xib               |  343 [32m+++++[m
+ macos/Runner/Configs/AppInfo.xcconfig              |   14 [32m+[m
+ macos/Runner/Configs/Debug.xcconfig                |    2 [32m+[m
+ macos/Runner/Configs/Release.xcconfig              |    2 [32m+[m
+ macos/Runner/Configs/Warnings.xcconfig             |   13 [32m+[m
+ macos/Runner/DebugProfile.entitlements             |   12 [32m+[m
+ macos/Runner/Info.plist                            |   32 [32m+[m
+ macos/Runner/MainFlutterWindow.swift               |   15 [32m+[m
+ macos/Runner/Release.entitlements                  |    8 [32m+[m
+ macos/RunnerTests/RunnerTests.swift                |   12 [32m+[m
+ pubspec.lock                                       |  258 [32m++++[m
+ pubspec.yaml                                       |   92 [32m++[m
+ test.txt                                           |    1 [32m+[m
+ test/widget_test.dart                              |   30 [32m+[m
+ web/favicon.png                                    |  Bin [31m0[m -> [32m917[m bytes
+ web/icons/Icon-192.png                             |  Bin [31m0[m -> [32m5292[m bytes
+ web/icons/Icon-512.png                             |  Bin [31m0[m -> [32m8252[m bytes
+ web/icons/Icon-maskable-192.png                    |  Bin [31m0[m -> [32m5594[m bytes
+ web/icons/Icon-maskable-512.png                    |  Bin [31m0[m -> [32m20998[m bytes
+ web/index.html                                     |   46 [32m+[m
+ web/manifest.json                                  |   35 [32m+[m
+ windows/.gitignore                                 |   17 [32m+[m
+ windows/CMakeLists.txt                             |  108 [32m++[m
+ windows/flutter/CMakeLists.txt                     |  109 [32m++[m
+ windows/flutter/generated_plugin_registrant.cc     |   11 [32m+[m
+ windows/flutter/generated_plugin_registrant.h      |   15 [32m+[m
+ windows/flutter/generated_plugins.cmake            |   23 [32m+[m
+ windows/runner/CMakeLists.txt                      |   40 [32m+[m
+ windows/runner/Runner.rc                           |  121 [32m++[m
+ windows/runner/flutter_window.cpp                  |   71 [32m+[m
+ windows/runner/flutter_window.h                    |   33 [32m+[m
+ windows/runner/main.cpp                            |   43 [32m+[m
+ windows/runner/resource.h                          |   16 [32m+[m
+ windows/runner/resources/app_icon.ico              |  Bin [31m0[m -> [32m33772[m bytes
+ windows/runner/runner.exe.manifest                 |   14 [32m+[m
+ windows/runner/utils.cpp                           |   65 [32m+[m
+ windows/runner/utils.h                             |   19 [32m+[m
+ windows/runner/win32_window.cpp                    |  288 [32m++++[m
+ windows/runner/win32_window.h                      |  102 [32m++[m
+ 188 files changed, 16532 insertions(+)
