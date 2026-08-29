@@ -33,7 +33,7 @@ CREATE TABLE appointments (
     completed_by CHAR(36) NULL,
     active_booking_service VARCHAR(32) NULL,
     version BIGINT NOT NULL DEFAULT 0,
-    CONSTRAINT fk_appointments_citizen FOREIGN KEY (citizen_id) REFERENCES citizens(id),
+    CONSTRAINT fk_appointments_citizen FOREIGN KEY (citizen_id) REFERENCES citizen_registry(id),
     CONSTRAINT fk_appointments_slot FOREIGN KEY (appointment_slot_id) REFERENCES appointment_slots(id),
     CONSTRAINT fk_appointments_completed_by FOREIGN KEY (completed_by) REFERENCES accounts(id)
 );
