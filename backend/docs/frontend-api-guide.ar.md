@@ -4,6 +4,14 @@
 
 ## 1. الإعداد الأساسي
 
+### عنوان الـAPI المنشور للتجربة
+
+```text
+https://chari-api.onrender.com
+```
+
+استخدمه كـBase URL في تطبيق الجوال. قد يتأخر أول طلب بعد فترة خمول بسبب الخطة المجانية في Render.
+
 ### عنوان الـAPI المحلي
 
 ```text
@@ -86,7 +94,7 @@ POST /auth/enrollment/otp
 ملاحظات UI:
 
 - لا تعتبر `202` إثباتًا أن الرقم الوطني موجود؛ الاستجابة متعمدة أن تكون متشابهة للرقم غير الموجود أو الهاتف غير الموثق.
-- محليًا يظهر OTP فقط في log الـBackend. في الإنتاج سيصل عبر SMS.
+- في بيئة التطوير وعلى Render حاليًا يظهر OTP فقط في Logs؛ لم يتم ربط مزود SMS حقيقي بعد.
 - اطلب من المستخدم إدخال رمز من ستة أرقام.
 - يجب تقييد زر إعادة الإرسال في الواجهة؛ الـBackend لديه rate limit أيضًا.
 
@@ -439,11 +447,15 @@ POST /api/v1/operations/citizens/{citizenId}/phone-verifications/{challengeId}/c
 
 | النوع | القيمة |
 |---|---|
-| API base URL | `http://localhost:8080` |
+| API base URL المحلي | `http://localhost:8080` |
 | مواطن جاهز | `citizen@local.chari.test` / `LocalPass123!` |
 | موظف جاهز | `employee@local.chari.test` / `LocalPass123!` |
 | Admin جاهز | `admin@local.chari.test` / `LocalPass123!` |
 | مواطن للتسجيل عبر OTP | national ID: `123456789` |
+
+الخدمة المنشورة على Render تستخدم `https://chari-api.onrender.com`، لكنها لا تحتوي حسابات أو مواطنين تجريبيين حاليًا. بيانات الجدول و`APP_DEMO_DATA_ENABLED=true` محلية فقط.
+
+تطبيق الجوال لا يحتاج CORS. إذا شغّل الفرونت كواجهة ويب، يجب إضافة domain الواجهة إلى `APP_ALLOWED_ORIGINS` في Render قبل إرسال الطلبات من المتصفح.
 
 شغّل fixtures فقط محليًا:
 

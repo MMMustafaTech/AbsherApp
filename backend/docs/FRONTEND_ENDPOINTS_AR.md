@@ -1,6 +1,8 @@
 # مسارات تطبيق المواطن - Frontend API Reference
 
-**Base URL محليًا:** `http://localhost:8080`  
+**Base URL المنشور للتجربة:** `https://chari-api.onrender.com`  
+**Base URL المحلي:** `http://localhost:8080`  
+الخدمة المنشورة لا تحتوي بيانات demo حاليًا، وقد يتأخر أول طلب بعد السكون لأن Render يستخدم الخطة المجانية.  
 كل مسار يبدأ بـ `/api/v1/me/` يحتاج Header:
 
 ```http
