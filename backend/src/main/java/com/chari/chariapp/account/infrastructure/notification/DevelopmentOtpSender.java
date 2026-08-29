@@ -7,8 +7,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+/**
+ * Temporary console-based OTP delivery used while an SMS provider is not configured.
+ * Replace it with a real provider before making the public API generally available.
+ */
 @Component
-@Profile({"local", "test"})
+@Profile({"local", "test", "prod"})
 public class DevelopmentOtpSender implements OtpSender {
 
     private static final Logger log = LoggerFactory.getLogger(DevelopmentOtpSender.class);
