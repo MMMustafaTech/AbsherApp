@@ -1,0 +1,459 @@
+# دليل الـ Frontend — Absher API
+
+هذا الملف هو عقد العمل الحالي بين الـFrontend والـBackend. استخدم فقط المسارات المذكورة هنا؛ المسارات القديمة محجوبة ولا يجب استهلاكها.
+
+## 1. الإعداد الأساسي
+
+### عنوان الـAPI المحلي
+
+```text
+http://localhost:8080
+```
+
+كل body يُرسل بصيغة JSON مع header:
+
+```http
+Content-Type: application/json
+```
+
+الـBackend يسمح محليًا للواجهات القادمة من:
+
+```text
+http://localhost:3000
+http://localhost:5173
+```
+
+### المصادقة
+
+بعد تسجيل الدخول يحصل العميل على:
+
+```json
+{
+  "accessToken": "jwt",
+  "refreshToken": "random-secret",
+  "tokenType": "Bearer",
+  "expiresIn": 900
+}
+```
+
+أرسل Access Token في كل request محمي:
+
+```http
+Authorization: Bearer <accessToken>
+```
+
+- Access Token قصير العمر: 15 دقيقة محليًا.
+- Refresh Token يُستخدم فقط مع `/api/v1/auth/refresh`.
+- عند refresh يصل Token pair جديد، والـrefresh token القديم يصبح غير صالح فورًا.
+- عند `401` بسبب انتهاء access token: نفّذ refresh مرة واحدة ثم أعد الطلب الأصلي. إن فشل refresh، امسح الجلسة وانقل المستخدم إلى صفحة login.
+- لا تطبع tokens في console ولا تضعها في URL أو logs أو analytics.
+
+في تطبيق ويب يفضّل حفظ Access Token في الذاكرة. يحتاج تخزين Refresh Token إلى قرار أمني مشترك لاحقًا؛ لا تضعه في `localStorage` في production بدون مراجعة أمنية.
+
+## 2. الأدوار والصلاحيات
+
+| Role | المسارات المتاحة |
+|---|---|
+| غير مسجل | health، enrollment، login، refresh، logout |
+| `CITIZEN` | `/api/v1/me/**` |
+| `EMPLOYEE` | `/api/v1/operations/**` |
+| `ADMIN` | operations و`/api/v1/admin/**` |
+
+لا يرسل الـFrontend رقمًا وطنيًا أو `citizenId` للوصول إلى بيانات المواطن الشخصية؛ الـBackend يستخرج هوية المواطن من JWT.
+
+## 3. التسجيل عبر OTP
+
+### 3.1 طلب OTP
+
+```http
+POST /auth/enrollment/otp
+```
+
+```json
+{
+  "nationalId": "123456789"
+}
+```
+
+نجاح متوقع — `202 Accepted`:
+
+```json
+{
+  "challengeId": "bf70abbf-d403-486f-af99-5d49c02ba969"
+}
+```
+
+ملاحظات UI:
+
+- لا تعتبر `202` إثباتًا أن الرقم الوطني موجود؛ الاستجابة متعمدة أن تكون متشابهة للرقم غير الموجود أو الهاتف غير الموثق.
+- محليًا يظهر OTP فقط في log الـBackend. في الإنتاج سيصل عبر SMS.
+- اطلب من المستخدم إدخال رمز من ستة أرقام.
+- يجب تقييد زر إعادة الإرسال في الواجهة؛ الـBackend لديه rate limit أيضًا.
+
+### 3.2 التحقق من OTP
+
+```http
+POST /auth/enrollment/otp/verify
+```
+
+```json
+{
+  "challengeId": "bf70abbf-d403-486f-af99-5d49c02ba969",
+  "code": "843361"
+}
+```
+
+النجاح: `204 No Content`.
+
+بعد النجاح انتقل مباشرة إلى إنشاء الحساب. الرمز قصير العمر، له حد للمحاولات، ولا يمكن استخدامه مرتين.
+
+### 3.3 إنشاء حساب مواطن
+
+```http
+POST /auth/enrollment/accounts
+```
+
+```json
+{
+  "challengeId": "bf70abbf-d403-486f-af99-5d49c02ba969",
+  "email": "citizen@example.com",
+  "password": "StrongPassword123!"
+}
+```
+
+النجاح — `201 Created`:
+
+```json
+{
+  "accountId": "36d94a14-5a05-4a64-9163-ba2b3119d00f"
+}
+```
+
+شروط الإدخال:
+
+- البريد الإلكتروني صالح وطوله حتى 254 حرفًا.
+- كلمة المرور من 12 إلى 128 حرفًا على الأقل. اعرض متطلبات كلمة المرور في الواجهة.
+
+بعد إنشاء الحساب، وجّه المستخدم إلى login؛ لا يصدر هذا endpoint tokens.
+
+## 4. المصادقة والجلسة
+
+### 4.1 تسجيل الدخول
+
+```http
+POST /api/v1/auth/login
+```
+
+```json
+{
+  "email": "citizen@example.com",
+  "password": "StrongPassword123!"
+}
+```
+
+النجاح: `200 OK` مع Token pair. فشل البريد/كلمة المرور يرجع `401` برسالة عامة؛ لا تحاول تمييز سبب الفشل في الواجهة.
+
+### 4.2 تجديد الجلسة
+
+```http
+POST /api/v1/auth/refresh
+```
+
+```json
+{
+  "refreshToken": "..."
+}
+```
+
+النجاح: `200 OK` مع Token pair جديد.
+
+### 4.3 تسجيل الخروج
+
+```http
+POST /api/v1/auth/logout
+```
+
+```json
+{
+  "refreshToken": "..."
+}
+```
+
+النجاح: `204 No Content`. بعده امسح الـtokens محليًا وانتقل إلى login.
+
+## 5. واجهة المواطن
+
+كل المسارات التالية تتطلب role `CITIZEN` وBearer token.
+
+### 5.1 الوثائق
+
+| Method | Endpoint | النتيجة |
+|---|---|---|
+| `GET` | `/api/v1/me/documents/passport` | بيانات جواز المواطن الحالي |
+| `GET` | `/api/v1/me/documents/national-identity` | بيانات الهوية الوطنية للمواطن الحالي |
+| `GET` | `/api/v1/me/documents/birth-certificate` | بيانات شهادة الميلاد للمواطن الحالي |
+
+مثال جواز:
+
+```json
+{
+  "passportNumber": "P123456",
+  "firstName": "Ahmed",
+  "lastName": "Ali",
+  "dateOfBirth": "1990-01-15",
+  "placeOfBirth": "N'Djamena",
+  "issuedOn": "2025-01-01",
+  "expiresOn": "2030-01-01",
+  "placeOfIssue": "N'Djamena",
+  "issuingAuthority": "...",
+  "profession": "...",
+  "nationality": "...",
+  "sex": "M"
+}
+```
+
+إن لم توجد الوثيقة يرجع `404`. هذه المرحلة لا تتضمن رفع مرفقات أو إصدار وثيقة جديدة بعد.
+
+### 5.2 إنشاء طلب جواز
+
+```http
+POST /api/v1/me/passport-requests
+Authorization: Bearer <accessToken>
+```
+
+لا يحتوي الطلب على body حاليًا.
+
+النجاح — `201 Created`:
+
+```json
+{
+  "id": "cd4166d7-275d-4418-b965-1fbba364f0c4",
+  "citizenId": { "value": "uuid" },
+  "status": "SUBMITTED",
+  "reviewedBy": null,
+  "submittedAt": "2026-08-29T08:11:26Z",
+  "reviewedAt": null,
+  "decisionReason": null
+}
+```
+
+قواعد UI:
+
+- يسمح النظام بطلب جواز مفتوح واحد فقط للمواطن.
+- إذا كان هناك طلب `SUBMITTED` أو `UNDER_REVIEW` يرجع `409 Conflict`.
+- بعد `APPROVED` أو `REJECTED` يمكن إنشاء طلب جديد.
+
+### 5.3 قائمة طلباتي
+
+```http
+GET /api/v1/me/passport-requests
+```
+
+ترجع array من نفس شكل طلب الجواز، مرتبة من الأحدث.
+
+### 5.4 سجل طلب جواز
+
+```http
+GET /api/v1/me/passport-requests/{requestId}/history
+```
+
+مثال response:
+
+```json
+[
+  {
+    "id": "uuid",
+    "requestId": "uuid",
+    "fromStatus": null,
+    "toStatus": "SUBMITTED",
+    "reason": null,
+    "changedBy": { "value": "uuid" },
+    "changedAt": "2026-08-29T08:11:26Z"
+  },
+  {
+    "fromStatus": "SUBMITTED",
+    "toStatus": "UNDER_REVIEW",
+    "reason": null,
+    "changedAt": "2026-08-29T08:12:19Z"
+  }
+]
+```
+
+اعرض الحالات كـtimeline. لا تعرض UUIDs للمستخدم النهائي.
+
+## 6. واجهة الموظف
+
+كل المسارات التالية تتطلب `EMPLOYEE` أو `ADMIN`.
+
+### 6.1 قائمة طلبات الجواز حسب الحالة
+
+```http
+GET /api/v1/operations/passport-requests?status=SUBMITTED
+```
+
+الحالات المدعومة حاليًا:
+
+```text
+SUBMITTED, UNDER_REVIEW, APPROVED, REJECTED
+```
+
+### 6.2 بدء مراجعة طلب
+
+```http
+POST /api/v1/operations/passport-requests/{requestId}/review
+```
+
+لا يوجد body. عند النجاح يرجع `200 OK` مع الطلب وحالته `UNDER_REVIEW` وبيانات `reviewedBy` و`reviewedAt`.
+
+### 6.3 اتخاذ قرار
+
+```http
+POST /api/v1/operations/passport-requests/{requestId}/decision
+```
+
+موافقة:
+
+```json
+{ "approved": true }
+```
+
+رفض:
+
+```json
+{
+  "approved": false,
+  "reason": "Missing supporting document"
+}
+```
+
+قواعد مهمة:
+
+- فقط الموظف الذي بدأ المراجعة يستطيع اتخاذ القرار.
+- الرفض يجب أن يحتوي سببًا غير فارغ.
+- الموظف المرتبط بنفس المواطن لا يستطيع مراجعة طلبه الشخصي.
+- `APPROVED` حاليًا قرار إداري فقط؛ لا يصدر جوازًا تلقائيًا.
+
+## 7. واجهة الإدارة
+
+هذه المسارات تتطلب `ADMIN` فقط.
+
+### 7.1 إنشاء حساب موظف
+
+```http
+POST /api/v1/admin/staff-accounts
+```
+
+```json
+{
+  "email": "employee@example.com",
+  "password": "StrongPassword123!"
+}
+```
+
+النجاح — `201 Created`:
+
+```json
+{
+  "accountId": "uuid",
+  "status": "ACTIVE"
+}
+```
+
+### 7.2 تفعيل أو تعطيل موظف
+
+```http
+PATCH /api/v1/admin/staff-accounts/{accountId}/status
+```
+
+```json
+{ "status": "DISABLED" }
+```
+
+القيم المسموح بها لهذا endpoint: `ACTIVE` أو `DISABLED` فقط.
+
+النجاح: `204 No Content`.
+
+تعطيل الحساب يلغي فعليًا صلاحية JWT الحالي للموظف؛ على الواجهة التعامل مع `401` بتسجيل الخروج.
+
+## 8. التحقق من هاتف مواطن بواسطة الموظف
+
+هذه الوظيفة لواجهة عمليات الموظف، وتتطلب `EMPLOYEE` أو `ADMIN`.
+
+### طلب رمز للهاتف
+
+```http
+POST /api/v1/operations/citizens/{citizenId}/phone-verifications
+```
+
+```json
+{ "phone": "+23590000001" }
+```
+
+النجاح: `202 Accepted` مع `challengeId`.
+
+### تأكيد الهاتف
+
+```http
+POST /api/v1/operations/citizens/{citizenId}/phone-verifications/{challengeId}/confirm
+```
+
+```json
+{ "code": "123456" }
+```
+
+النجاح: `204 No Content`. الرقم يجب أن يكون بتنسيق E.164، مثل `+23590000001`.
+
+## 9. الأخطاء المتوقعة
+
+شكل الخطأ غالبًا:
+
+```json
+{
+  "message": "...",
+  "status": 400,
+  "timestamp": "2026-08-29T..."
+}
+```
+
+| Status | التعامل في الواجهة |
+|---|---|
+| `400` | أظهر رسالة إدخال عامة، ولا تفترض أن الرقم الوطني أو البريد موجود. |
+| `401` | حاول refresh مرة واحدة؛ إن فشل امسح الجلسة وانتقل إلى login. |
+| `403` | أظهر شاشة/رسالة عدم امتلاك صلاحية. |
+| `404` | المورد أو الوثيقة غير موجودة. |
+| `409` | اعرض رسالة حالة العمل، مثل وجود طلب جواز مفتوح أو انتقال حالة غير مسموح. |
+| `429` | أوقف إعادة المحاولة، واقرأ `Retry-After` إن وُجد، ثم فعّل الزر لاحقًا. |
+| `500` | رسالة عامة مع زر إعادة المحاولة؛ لا تعرض تفاصيل الخطأ التقنية للمستخدم. |
+
+## 10. ما لا يجب على الـFrontend فعله
+
+- لا تستخدم المسارات القديمة: `/passport/**` و`/birth-certificate/**` و`/api/national-ids/**`؛ هي محجوبة.
+- لا ترسل الرقم الوطني في endpoints الخاصة بالوثائق أو الطلبات.
+- لا تعتمد على `citizenId.value` المعاد في responses كوسيلة صلاحية أو عرض للمستخدم.
+- لا تحاول إنشاء أو ترقية حساب `ADMIN` من الواجهة؛ هذا غير متاح عبر API.
+- لا تتوقع حاليًا رفع ملفات أو مرفقات طلب جواز؛ هذه الميزة مؤجلة.
+
+## 11. بيانات محلية للتجربة فقط
+
+لا تستخدم هذه البيانات خارج بيئة local:
+
+| النوع | القيمة |
+|---|---|
+| API base URL | `http://localhost:8080` |
+| مواطن جاهز | `citizen@local.absher.test` / `LocalPass123!` |
+| موظف جاهز | `employee@local.absher.test` / `LocalPass123!` |
+| Admin جاهز | `admin@local.absher.test` / `LocalPass123!` |
+| مواطن للتسجيل عبر OTP | national ID: `123456789` |
+
+شغّل fixtures فقط محليًا:
+
+```text
+APP_DEMO_DATA_ENABLED=true
+```
+
+تتوفر أيضًا الملفات الجاهزة للتجربة:
+
+```text
+postman/Absher-Local.postman_collection.json
+postman/Absher-Local.postman_environment.json
+```

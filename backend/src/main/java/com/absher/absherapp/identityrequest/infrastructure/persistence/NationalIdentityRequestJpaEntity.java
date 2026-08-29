@@ -1,0 +1,58 @@
+package com.absher.absherapp.identityrequest.infrastructure.persistence;
+
+import com.absher.absherapp.account.domain.AccountId;
+import com.absher.absherapp.citizen.domain.CitizenId;
+import com.absher.absherapp.identityrequest.domain.NationalIdentityRequest;
+import com.absher.absherapp.identityrequest.domain.NationalIdentityRequestKind;
+import com.absher.absherapp.identityrequest.domain.NationalIdentityRequestStatus;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.Version;
+
+import java.time.Instant;
+import java.util.UUID;
+
+@Entity
+@Table(name = "service_requests")
+public class NationalIdentityRequestJpaEntity {
+    static final String TYPE = "NATIONAL_IDENTITY";
+    @Id @Column(length = 36, columnDefinition = "CHAR(36)") private String id;
+    @Column(name = "citizen_id", length = 36, nullable = false, columnDefinition = "CHAR(36)") private String citizenId;
+    @Column(nullable = false, length = 64) private String type;
+    @Enumerated(EnumType.STRING) @Column(name = "request_kind", nullable = false, length = 32) private NationalIdentityRequestKind requestKind;
+    @Column(name = "request_reason", length = 1000) private String requestReason;
+    @Enumerated(EnumType.STRING) @Column(nullable = false, length = 32) private NationalIdentityRequestStatus status;
+    @Column(name = "submitted_at", nullable = false) private Instant submittedAt;
+    @Column(name = "reviewed_by", length = 36, columnDefinition = "CHAR(36)") private String reviewedBy;
+    @Column(name = "reviewed_at") private Instant reviewedAt;
+    @Column(name = "decision_reason", length = 1000) private String decisionReason;
+    @Column(name = "open_request_key", length = 36, columnDefinition = "CHAR(36)") private String openRequestKey;
+    @Column(name = "open_request_type", length = 64) private String openRequestType;
+    @Version private Long version;
+
+    protected NationalIdentityRequestJpaEntity() { }
+    private NationalIdentityRequestJpaEntity(NationalIdentityRequest request) { apply(request); }
+    static NationalIdentityRequestJpaEntity from(NationalIdentityRequest request) { return new NationalIdentityRequestJpaEntity(request); }
+
+    void apply(NationalIdentityRequest request) {
+        id = request.id().toString(); citizenId = request.citizenId().value().toString(); type = TYPE;
+        requestKind = request.kind(); requestReason = request.requestReason(); status = request.status(); submittedAt = request.submittedAt();
+        reviewedBy = request.reviewedBy() == null ? null : request.reviewedBy().value().toString(); reviewedAt = request.reviewedAt();
+        decisionReason = request.decisionReason(); openRequestKey = request.status().isOpen() ? citizenId : null;
+        openRequestType = request.status().isOpen() ? TYPE : null;
+    }
+
+    NationalIdentityRequest toDomain() {
+        return new NationalIdentityRequest(UUID.fromString(id), new CitizenId(UUID.fromString(citizenId)), requestKind,
+                requestReason, status, reviewedBy == null ? null : new AccountId(UUID.fromString(reviewedBy)),
+                submittedAt, reviewedAt, decisionReason);
+    }
+
+    boolean isNationalIdentityRequest() {
+        return TYPE.equals(type);
+    }
+}
