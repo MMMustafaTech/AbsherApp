@@ -1,4 +1,0 @@
-package com.absher.absherapp.birthrequest.infrastructure.persistence;
-import org.springframework.data.jpa.repository.JpaRepository;
-import java.util.*;
-interface SpringDataBirthCertificateRequestStatusHistoryRepository extends JpaRepository<BirthCertificateRequestStatusHistoryJpaEntity,String>{List<BirthCertificateRequestStatusHistoryJpaEntity> findByRequestIdOrderByChangedAtAsc(String requestId);}

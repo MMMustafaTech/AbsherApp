@@ -14,7 +14,7 @@ Authorization: Bearer <accessToken>
 
 للتجربة المحلية شغّل المشروع مع `APP_DEMO_DATA_ENABLED=true`.
 
-- مواطن موجود: `citizen@local.absher.test` / `LocalPass123!`
+- مواطن موجود: `citizen@local.chari.test` / `LocalPass123!`
 - مواطن للتسجيل: الرقم الوطني `123456789`، ورمز OTP يظهر في Log الـBackend.
 
 ## الدخول والجلسة
@@ -52,7 +52,7 @@ Authorization: Bearer <accessToken>
 `POST /api/v1/auth/login`
 
 ```json
-{ "email": "citizen@local.absher.test", "password": "LocalPass123!" }
+{ "email": "citizen@local.chari.test", "password": "LocalPass123!" }
 ```
 
 الاستجابة تتضمن `accessToken` و`refreshToken` و`expiresIn`. الـaccess token قصير العمر؛ عند 401 استخدم:

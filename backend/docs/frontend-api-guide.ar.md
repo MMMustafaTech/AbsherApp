@@ -1,4 +1,4 @@
-# دليل الـ Frontend — Absher API
+# دليل الـ Frontend — Chari API
 
 هذا الملف هو عقد العمل الحالي بين الـFrontend والـBackend. استخدم فقط المسارات المذكورة هنا؛ المسارات القديمة محجوبة ولا يجب استهلاكها.
 
@@ -440,9 +440,9 @@ POST /api/v1/operations/citizens/{citizenId}/phone-verifications/{challengeId}/c
 | النوع | القيمة |
 |---|---|
 | API base URL | `http://localhost:8080` |
-| مواطن جاهز | `citizen@local.absher.test` / `LocalPass123!` |
-| موظف جاهز | `employee@local.absher.test` / `LocalPass123!` |
-| Admin جاهز | `admin@local.absher.test` / `LocalPass123!` |
+| مواطن جاهز | `citizen@local.chari.test` / `LocalPass123!` |
+| موظف جاهز | `employee@local.chari.test` / `LocalPass123!` |
+| Admin جاهز | `admin@local.chari.test` / `LocalPass123!` |
 | مواطن للتسجيل عبر OTP | national ID: `123456789` |
 
 شغّل fixtures فقط محليًا:
@@ -454,6 +454,6 @@ APP_DEMO_DATA_ENABLED=true
 تتوفر أيضًا الملفات الجاهزة للتجربة:
 
 ```text
-postman/Absher-Local.postman_collection.json
-postman/Absher-Local.postman_environment.json
+postman/Chari-Local.postman_collection.json
+postman/Chari-Local.postman_environment.json
 ```

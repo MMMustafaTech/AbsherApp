@@ -8,11 +8,11 @@
         <version>4.0.3</version>
         <relativePath/> <!-- lookup parent from a repository -->
     </parent>
-    <groupId>com.absher</groupId>
-    <artifactId>absher-app</artifactId>
+    <groupId>com.chari</groupId>
+    <artifactId>chari-app</artifactId>
     <version>0.0.1-SNAPSHOT</version>
-    <name>AbsherApp</name>
-    <description>AbsherApp</description>
+    <name>ChariApp</name>
+    <description>ChariApp</description>
     <url/>
     <licenses>
         <license/>

@@ -20,7 +20,7 @@ The domain has no dependency on Spring MVC, Spring Security, JPA, HTTP, or MySQL
 ## Package layout
 
 ```text
-com.absher.absherapp
+com.chari.chariapp
 ├── shared
 │   ├── domain
 │   ├── application

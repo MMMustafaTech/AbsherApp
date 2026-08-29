@@ -1,0 +1,23 @@
+package com.chari.chariapp.birthrequest.application;
+
+import com.chari.chariapp.account.domain.*;
+import com.chari.chariapp.birthrequest.application.port.out.*;
+import com.chari.chariapp.birthrequest.domain.*;
+import com.chari.chariapp.exception.NotFoundException;
+import com.chari.chariapp.request.application.PassportRequestActorAccess;
+import com.chari.chariapp.shared.application.port.out.OperationalAuditStore;
+import com.chari.chariapp.notification.application.NotificationService;
+import com.chari.chariapp.notification.domain.NotificationType;
+import org.springframework.transaction.annotation.Transactional;
+import java.time.*;
+import java.util.UUID;
+
+public class ReviewBirthCertificateRequestService {
+    private final PassportRequestActorAccess access; private final BirthCertificateRequestStore requests; private final BirthCertificateRequestStatusHistoryStore history; private final OperationalAuditStore audit; private final NotificationService notifications; private final Clock clock;
+    public ReviewBirthCertificateRequestService(PassportRequestActorAccess access, BirthCertificateRequestStore requests, BirthCertificateRequestStatusHistoryStore history, OperationalAuditStore audit, NotificationService notifications, Clock clock) { this.access = access; this.requests = requests; this.history = history; this.audit = audit; this.notifications = notifications; this.clock = clock; }
+    @Transactional public BirthCertificateRequest startReview(AccountId actorId, UUID requestId) { Account operator = access.requireActiveOperator(actorId); BirthCertificateRequest current = find(requestId); rejectSelfReview(operator, current); Instant now = Instant.now(clock); BirthCertificateRequest updated = current.startReview(actorId, now); requests.save(updated); history(updated, current, null, actorId, now); audit.record(actorId.value().toString(), "BIRTH_CERTIFICATE_REQUEST_REVIEW_STARTED", "SERVICE_REQUEST", requestId.toString(), null, now); return updated; }
+    @Transactional public BirthCertificateRequest decide(AccountId actorId, UUID requestId, boolean approved, String reason) { Account operator = access.requireActiveOperator(actorId); BirthCertificateRequest current = find(requestId); rejectSelfReview(operator, current); Instant now = Instant.now(clock); BirthCertificateRequest updated = current.decide(actorId, approved, reason, now); requests.save(updated); history(updated, current, updated.decisionReason(), actorId, now); audit.record(actorId.value().toString(), approved ? "BIRTH_CERTIFICATE_REQUEST_APPROVED" : "BIRTH_CERTIFICATE_REQUEST_REJECTED", "SERVICE_REQUEST", requestId.toString(), null, now); notifications.publish(updated.citizenId(), approved ? NotificationType.BIRTH_CERTIFICATE_REQUEST_APPROVED : NotificationType.BIRTH_CERTIFICATE_REQUEST_REJECTED, approved ? "Birth certificate request approved" : "Birth certificate request rejected", approved ? "Your birth certificate request has been approved." : "Your birth certificate request has been rejected."); return updated; }
+    private BirthCertificateRequest find(UUID id) { return requests.findByIdForUpdate(id).orElseThrow(() -> new NotFoundException("Request not found")); }
+    private void rejectSelfReview(Account operator, BirthCertificateRequest request) { if (operator.citizenIdOptional().filter(request.citizenId()::equals).isPresent()) throw new BirthCertificateRequestConflictException("An operator cannot review their own birth certificate request"); }
+    private void history(BirthCertificateRequest updated, BirthCertificateRequest previous, String reason, AccountId actor, Instant at) { history.append(new BirthCertificateRequestStatusChange(UUID.randomUUID(), updated.id(), previous.status(), updated.status(), reason, actor, at)); }
+}
