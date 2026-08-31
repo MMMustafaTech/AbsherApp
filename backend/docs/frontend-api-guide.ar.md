@@ -24,12 +24,13 @@ http://localhost:8080
 Content-Type: application/json
 ```
 
-الـBackend يسمح محليًا للواجهات القادمة من:
+عند تشغيل Flutter كويب محليًا يسمح الـBackend بعنوان تطوير ديناميكي:
 
 ```text
-http://localhost:3000
-http://localhost:5173
+http://localhost:*
 ```
+
+الخدمة المنشورة على Render مهيأة أيضًا لاختبار `localhost` من المتصفح. عند نشر واجهة ويب حقيقية، أضف domain الواجهة الصريح إلى `APP_ALLOWED_ORIGINS` في Render.
 
 ### المصادقة
 
@@ -229,7 +230,11 @@ POST /api/v1/me/passport-requests
 Authorization: Bearer <accessToken>
 ```
 
-لا يحتوي الطلب على body حاليًا.
+أرسل نوع الطلب، ومعه سبب عند الحاجة:
+
+```json
+{ "kind": "ISSUANCE", "reason": null }
+```
 
 النجاح — `201 Created`:
 
@@ -288,6 +293,19 @@ GET /api/v1/me/passport-requests/{requestId}/history
 ```
 
 اعرض الحالات كـtimeline. لا تعرض UUIDs للمستخدم النهائي.
+
+### 5.5 مسارات المواطن الإضافية الحالية
+
+| المجال | المسارات المتاحة |
+|---|---|
+| الصفحة الرئيسية والملف الشخصي | `GET /api/v1/me/home`، `GET /api/v1/me/profile`، `PATCH /api/v1/me/profile/password`، `POST /api/v1/me/profile/logout-all` |
+| طلبات الهوية الوطنية | إنشاء، قائمة، وسجل تحت `/api/v1/me/national-identity-requests` |
+| طلبات شهادة الميلاد | إنشاء، قائمة، سجل، وبيانات المولود تحت `/api/v1/me/birth-certificate-requests` |
+| المرفقات | رفع وقائمة مرفقات لطلبات الجواز والهوية وشهادة الميلاد |
+| المواعيد | slots، حجز، قائمة، وإلغاء تحت `/api/v1/me/appointments` |
+| الإشعارات | قائمة، غير المقروءة، قراءة إشعار، وقراءة الكل تحت `/api/v1/me/notifications` |
+
+التفاصيل والـbody لكل هذه المسارات موجودة في المرجع التفصيلي: `FRONTEND_ENDPOINTS_AR.md`.
 
 ## 6. واجهة الموظف
 
@@ -439,9 +457,9 @@ POST /api/v1/operations/citizens/{citizenId}/phone-verifications/{challengeId}/c
 - لا ترسل الرقم الوطني في endpoints الخاصة بالوثائق أو الطلبات.
 - لا تعتمد على `citizenId.value` المعاد في responses كوسيلة صلاحية أو عرض للمستخدم.
 - لا تحاول إنشاء أو ترقية حساب `ADMIN` من الواجهة؛ هذا غير متاح عبر API.
-- لا تتوقع حاليًا رفع ملفات أو مرفقات طلب جواز؛ هذه الميزة مؤجلة.
+- استخدم endpoint المرفقات المناسب فقط عند الحاجة، وبصيغة `multipart/form-data` والحقل `file`.
 
-## 11. بيانات محلية للتجربة فقط
+## 11. بيانات التجربة
 
 لا تستخدم هذه البيانات خارج بيئة local:
 
@@ -453,9 +471,9 @@ POST /api/v1/operations/citizens/{citizenId}/phone-verifications/{challengeId}/c
 | Admin جاهز | `admin@local.chari.test` / `LocalPass123!` |
 | مواطن للتسجيل عبر OTP | national ID: `123456789` |
 
-الخدمة المنشورة على Render تستخدم `https://chari-api.onrender.com`، لكنها لا تحتوي حسابات أو مواطنين تجريبيين حاليًا. بيانات الجدول و`APP_DEMO_DATA_ENABLED=true` محلية فقط.
+الخدمة المنشورة على Render تحتوي سجل مواطن اختبار للهوية `123456789` فقط. أنشئ له حسابًا بنفس تدفق OTP؛ لا توجد حسابات موظف أو أدمن تجريبية مستضافة.
 
-تطبيق الجوال لا يحتاج CORS. إذا شغّل الفرونت كواجهة ويب، يجب إضافة domain الواجهة إلى `APP_ALLOWED_ORIGINS` في Render قبل إرسال الطلبات من المتصفح.
+تطبيق الجوال لا يحتاج CORS. الواجهة المحلية على المتصفح مسموحة حاليًا عبر `http://localhost:*`. عند نشر واجهة ويب حقيقية، أضف domain الواجهة إلى `APP_ALLOWED_ORIGINS` في Render.
 
 شغّل fixtures فقط محليًا:
 

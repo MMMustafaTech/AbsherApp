@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:frontend/controller/passport_controller.dart';
 import 'package:frontend/core/constant/app_colors.dart';
 
 class PassportServicesScreen extends StatefulWidget {
@@ -9,6 +10,11 @@ class PassportServicesScreen extends StatefulWidget {
 }
 
 class _PassportServicesScreen extends State<PassportServicesScreen> {
+  final PassportController _controller = PassportController();
+
+  Future<void> _submit(String kind, {String? reason}) async {
+    await _controller.submitRequest(context, kind, reason: reason);
+  }
   Widget _buildServiceCard({
     required String title,
     required IconData icon,
@@ -97,24 +103,27 @@ class _PassportServicesScreen extends State<PassportServicesScreen> {
             _buildServiceCard(
               title: "تجديد جواز السفر",
               icon: Icons.fiber_new_rounded,
-              onTap: () => Navigator.of(context).pushNamed("home"),
+              onTap: () => _submit('RENEWAL'),
             ),
 
             _buildServiceCard(
               title: "إصدار جواز سفر",
               icon: Icons.assignment_turned_in_rounded,
-              onTap: () {},
+              onTap: () => _submit('ISSUANCE'),
             ),
 
             _buildServiceCard(
               title: "طلب تعديل بيانات",
               icon: Icons.edit_note_rounded,
-              onTap: () {},
+              onTap: () => _submit(
+                'DATA_CORRECTION',
+                reason: 'طلب تعديل بيانات الجواز',
+              ),
             ),
             _buildServiceCard(
               title: "بدل فاقد / تالف",
               icon: Icons.replay_rounded,
-              onTap: () {},
+              onTap: () => _submit('LOST', reason: 'طلب بدل فاقد أو تالف'),
             ),
           ],
         ),

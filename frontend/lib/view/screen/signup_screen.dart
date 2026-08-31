@@ -13,6 +13,7 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final AuthController controller = AuthController();
+  bool _otpRequested = false;
 
   @override
   void dispose() {
@@ -83,15 +84,31 @@ class _SignupScreenState extends State<SignupScreen> {
                                 controller: controller.confirmPassController,
                                 isPassword: true,
                               ),
+                              if (_otpRequested) ...[
+                                const SizedBox(height: 12),
+                                CustomTextFormAuth(
+                                  hinttext: "رمز التحقق المكوّن من 6 أرقام",
+                                  controller: controller.otpController,
+                                  isPassword: false,
+                                ),
+                              ],
                               const SizedBox(height: 10),
                               CustomButtonAuth(
-                                text: "انشاء حساب",
+                                text: _otpRequested
+                                    ? "تأكيد الرمز وإنشاء الحساب"
+                                    : "إرسال رمز التحقق",
                                 onPressed: () async {
-                                  final success = await controller.signup(
-                                    context,
-                                  );
+                                  final success = _otpRequested
+                                      ? await controller.completeSignup(context)
+                                      : await controller.requestSignupOtp(context);
                                   if (success) {
-                                    Navigator.of(context).pushNamed("login");
+                                    if (_otpRequested) {
+                                      if (context.mounted) {
+                                        Navigator.of(context).pushNamed("login");
+                                      }
+                                    } else {
+                                      setState(() => _otpRequested = true);
+                                    }
                                   }
                                 },
                               ),

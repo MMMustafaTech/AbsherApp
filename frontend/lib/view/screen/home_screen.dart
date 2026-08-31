@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/constant/app_colors.dart';
+import 'package:frontend/data/datasource/chari_api.dart';
 import 'package:frontend/data/model/user_model.dart';
 import 'package:frontend/view/widget/cart.dart';
 import 'package:frontend/view/widget/quick_acsess_card.dart';
@@ -286,8 +287,13 @@ class _HomeScreenState extends State<HomeScreen> {
               "تسجيل الخروج",
               style: TextStyle(color: Colors.red),
             ),
-            onTap: () {
-              Navigator.of(context).pushReplacementNamed("login");
+            onTap: () async {
+              try {
+                await ChariApi().logout();
+              } finally {
+                if (!mounted) return;
+                Navigator.of(context).pushReplacementNamed("login");
+              }
             },
           ),
         ],

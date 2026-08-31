@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/constant/app_colors.dart';
+import 'package:frontend/controller/birth_certificate_controller.dart';
 
 class NewbornRegistration extends StatefulWidget {
   const NewbornRegistration({super.key});
@@ -24,22 +25,74 @@ class _NewbornRegistration extends State<NewbornRegistration> {
 
   final TextEditingController _fatherIdController = TextEditingController();
   final TextEditingController _motherIdController = TextEditingController();
+  final TextEditingController _fatherNameController = TextEditingController();
+  final TextEditingController _motherNameController = TextEditingController();
   final TextEditingController _babyNameController = TextEditingController();
   final TextEditingController _hospitalController = TextEditingController();
   final TextEditingController _cityController = TextEditingController();
   final TextEditingController _countryController = TextEditingController();
   final TextEditingController _birthDateController = TextEditingController();
+  bool _submitting = false;
 
   @override
   void dispose() {
     _fatherIdController.dispose();
     _motherIdController.dispose();
+    _fatherNameController.dispose();
+    _motherNameController.dispose();
     _babyNameController.dispose();
     _hospitalController.dispose();
     _cityController.dispose();
     _countryController.dispose();
     _birthDateController.dispose();
     super.dispose();
+  }
+
+  Future<void> _submit() async {
+    final childName = _babyNameController.text.trim().split(RegExp(r'\\s+'));
+    if (_selectedField == null ||
+        _selectedGender == null ||
+        childName.length < 2 ||
+        _fatherNameController.text.trim().isEmpty ||
+        _motherNameController.text.trim().isEmpty ||
+        _fatherIdController.text.trim().isEmpty ||
+        _motherIdController.text.trim().isEmpty ||
+        _hospitalController.text.trim().isEmpty ||
+        _birthDateController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'أكمل جميع الحقول المطلوبة، واكتب اسم المولود الأول والأخير.',
+          ),
+        ),
+      );
+      return;
+    }
+    if (!RegExp(
+      r'^\\d{4}-\\d{2}-\\d{2}$',
+    ).hasMatch(_birthDateController.text.trim())) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('اكتب تاريخ الميلاد بصيغة YYYY-MM-DD.')),
+      );
+      return;
+    }
+
+    setState(() => _submitting = true);
+    final success = await BirthCertificateController()
+        .newBornRegistration(context, {
+          'childFirstName': childName.first,
+          'childLastName': childName.skip(1).join(' '),
+          'dateOfBirth': _birthDateController.text.trim(),
+          'placeOfBirth': _hospitalController.text.trim(),
+          'gender': _selectedGender == 'ذكر' ? 'MALE' : 'FEMALE',
+          'fatherFullName': _fatherNameController.text.trim(),
+          'fatherNationalId': _fatherIdController.text.trim(),
+          'motherFullName': _motherNameController.text.trim(),
+          'motherNationalId': _motherIdController.text.trim(),
+        });
+    if (!mounted) return;
+    setState(() => _submitting = false);
+    if (success) Navigator.of(context).pop();
   }
 
   Widget _buildSectionHeader({
@@ -203,9 +256,19 @@ class _NewbornRegistration extends State<NewbornRegistration> {
                   ),
                   const SizedBox(height: 12),
                   _buildInputField(
+                    hint: "اسم الأب الكامل",
+                    icon: Icons.person_outline,
+                    controller: _fatherNameController,
+                  ),
+                  _buildInputField(
                     hint: "رقم هوية الأب",
                     icon: Icons.person_outline,
                     controller: _fatherIdController,
+                  ),
+                  _buildInputField(
+                    hint: "اسم الأم الكامل",
+                    icon: Icons.person_outline,
+                    controller: _motherNameController,
                   ),
                   _buildInputField(
                     hint: "رقم هوية الأم",
@@ -229,7 +292,7 @@ class _NewbornRegistration extends State<NewbornRegistration> {
 
                   // الاسم
                   _buildInputField(
-                    hint: "اسم المولود",
+                    hint: "اسم المولود الأول والأخير",
                     icon: Icons.person,
                     controller: _babyNameController,
                   ),
@@ -302,7 +365,7 @@ class _NewbornRegistration extends State<NewbornRegistration> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: _submitting ? null : _submit,
                 label: const Text(
                   "تقديم طلب التسجيل",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),

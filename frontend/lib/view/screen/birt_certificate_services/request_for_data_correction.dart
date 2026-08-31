@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/core/constant/app_colors.dart';
+import 'package:frontend/controller/birth_certificate_controller.dart';
 
 class RequestForDataCorrection extends StatefulWidget {
   const RequestForDataCorrection({super.key});
@@ -15,6 +16,7 @@ class _RequestForDataCorrection extends State<RequestForDataCorrection> {
 
   String? _selectedField;
   bool _isVerified = false;
+  bool _submitting = false;
 
   final List<Map<String, String>> _fields = [
     {"title": "الاسم", "subtitle": "اسم الطفل"},
@@ -33,6 +35,36 @@ class _RequestForDataCorrection extends State<RequestForDataCorrection> {
     _newValueController.dispose();
     _reasonController.dispose();
     super.dispose();
+  }
+
+  Future<void> _submit() async {
+    if (_certNumberController.text.trim().isEmpty ||
+        _selectedField == null ||
+        _newValueController.text.trim().isEmpty ||
+        _reasonController.text.trim().isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text(
+            'أدخل رقم الشهادة والحقل والقيمة الجديدة وسبب التعديل.',
+          ),
+        ),
+      );
+      return;
+    }
+
+    final reason =
+        'شهادة رقم: ${_certNumberController.text.trim()} | '
+        'الحقل: $_selectedField | '
+        'القيمة الجديدة: ${_newValueController.text.trim()} | '
+        'السبب: ${_reasonController.text.trim()}';
+    setState(() => _submitting = true);
+    final success = await BirthCertificateController().requestForDataCorrection(
+      context,
+      reason,
+    );
+    if (!mounted) return;
+    setState(() => _submitting = false);
+    if (success) Navigator.of(context).pop();
   }
 
   Widget _buildSectionCard({required Widget child}) {
@@ -199,7 +231,17 @@ class _RequestForDataCorrection extends State<RequestForDataCorrection> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
-                      onPressed: () => setState(() => _isVerified = true),
+                      onPressed: () {
+                        if (_certNumberController.text.trim().isEmpty) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text('أدخل رقم شهادة الميلاد أولًا.'),
+                            ),
+                          );
+                          return;
+                        }
+                        setState(() => _isVerified = true);
+                      },
                       icon: const Icon(Icons.remove_red_eye_outlined),
                       label: const Text("عرض البيانات"),
                       style: ElevatedButton.styleFrom(
@@ -234,7 +276,7 @@ class _RequestForDataCorrection extends State<RequestForDataCorrection> {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            "تم العثور على الشهادة بنجاح",
+                            "تم حفظ رقم الشهادة مع طلب التعديل",
                             style: TextStyle(
                               color: Colors.green.shade700,
                               fontWeight: FontWeight.bold,
@@ -392,7 +434,7 @@ class _RequestForDataCorrection extends State<RequestForDataCorrection> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton.icon(
-                onPressed: () {},
+                onPressed: _submitting ? null : _submit,
                 icon: const Icon(Icons.send),
                 label: const Text(
                   "تقديم طلب التعديل",

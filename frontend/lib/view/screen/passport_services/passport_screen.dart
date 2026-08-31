@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:frontend/data/model/passport_model.dart';
-import 'package:frontend/data/model/user_model.dart';
 import 'package:frontend/controller/passport_controller.dart';
 
 class PassportScreen extends StatefulWidget {
@@ -18,21 +17,19 @@ class _PassportScreenState extends State<PassportScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final user = ModalRoute.of(context)?.settings.arguments as UserModel?;
-    if (user != null && isLoading) {
-      _loadData(user.id);
+    if (isLoading) {
+      _loadData();
     }
   }
 
-  Future<void> _loadData(String id) async {
-    final result = await _passportController.fetchPassport(context, id);
+  Future<void> _loadData() async {
+    final result = await _passportController.fetchPassport(context);
     if (mounted) {
       setState(() {
         passport = result;
         isLoading = false;
       });
     }
-    print("the national id $id");
   }
 
   @override

@@ -53,9 +53,9 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
                 SizedBox(height: 90),
                 CustomTextFormAuth(
-                  hinttext: "National id",
+                  hinttext: "البريد الإلكتروني",
                   isPassword: false,
-                  controller: controller.idController,
+                  controller: controller.emailController,
                 ),
                 SizedBox(height: 12),
                 CustomTextFormAuth(
@@ -82,8 +82,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   text: "تسجيل الدخول",
                   onPressed: () async {
                     final user = await controller.login(context);
+                    if (!context.mounted) return;
                     if (user != null) {
-                      Navigator.of(context).pushNamed("home", arguments: user);
+                      Navigator.of(context).pushNamedAndRemoveUntil(
+                        "home",
+                        (_) => false,
+                        arguments: user,
+                      );
                     }
                   },
                 ),
