@@ -466,7 +466,7 @@ POST /api/v1/operations/citizens/{citizenId}/phone-verifications/{challengeId}/c
 | النوع | القيمة |
 |---|---|
 | API base URL المحلي | `http://localhost:8080` |
-| مواطن جاهز | `citizen@local.chari.test` / `LocalPass123!` |
+| مواطن جاهز | `test@example.com` / `1234567891011` |
 | موظف جاهز | `employee@local.chari.test` / `LocalPass123!` |
 | Admin جاهز | `admin@local.chari.test` / `LocalPass123!` |
 | مواطن للتسجيل عبر OTP | national ID: `123456789` |
